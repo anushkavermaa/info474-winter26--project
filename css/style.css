@@ -129,6 +129,22 @@ body {
   fill: #7e5e3d;
 }
 
+/* scatter plot filter controls */
+#vis .scatter-controls {
+  position: absolute;
+  top: 180px;
+  right: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 200;
+}
+#vis .scatter-controls select {
+  font-size: 12px;
+  padding: 4px 6px;
+  width: 110px;
+}
+
 .axis path,
 .axis line {
   fill: none;

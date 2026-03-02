@@ -19,6 +19,14 @@
           window.VizMap.hide(p);
         }
 
+        // remove scatter controls when leaving that slot
+        if (ai !== 2) {
+          var ctrl = document.querySelector('#vis .scatter-controls');
+          if (ctrl) ctrl.remove();
+          // allow filters to be rebuilt next time
+          manager._filtersBuilt = false;
+        }
+
         // Show map as the first visualization.
         // ai=0 is the first section/visual slot.
         if (ai === 0 && window.VizMap && typeof window.VizMap.draw === 'function') {
@@ -40,6 +48,12 @@
           return;
         }
   
+        // override screenshot with real viz for some slots
+        if (ai === 2 && window.VizScatter && typeof window.VizScatter.draw === 'function') {
+          window.VizScatter.draw(p, manager, ai, progress);
+          return;
+        }
+
         // load images (only once each)
         for (let i = 0; i < imageFiles.length; i++) {
           if (!imgs[i]) imgs[i] = p.loadImage(imageFiles[i]);
