@@ -100,7 +100,7 @@ body {
 
 #vis canvas {
   display: block;
-  background: transparent;
+  background: rgba(255, 253, 248, 0.92);
 }
 
 /* visibility helpers for popup effect controlled by VisualController */

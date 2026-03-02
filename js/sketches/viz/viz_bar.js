@@ -278,8 +278,10 @@
             p.noStroke();
             p.fill(85);
             p.textSize(13);
+            p.textStyle(p.BOLD);
             p.textAlign(p.LEFT, p.BOTTOM);
-            p.text('Area', panelLeft + 8, y0 - 10);
+            p.text('Area', panelLeft + 8, y0 - 4);
+            p.textStyle(p.NORMAL);
 
             for (var i = 0; i < areaCounts.length; i++) {
                 var item = areaCounts[i];
@@ -308,8 +310,10 @@
             p.fill(80);
             p.noStroke();
             p.textSize(14);
+            p.textStyle(p.BOLD);
             p.textAlign(p.CENTER, p.BASELINE);
-            p.text('Number of Distinct Cuisines', (x0 + x1) / 2, panelTop + panelHeight - 16);
+            p.text('Number of Distinct Cuisines', (x0 + x1) / 2, y1 + 48);
+            p.textStyle(p.NORMAL);
 
             if (hovered) {
                 drawTooltip(
