@@ -19,10 +19,12 @@
           window.VizMap.hide(p);
         }
 
-        // remove scatter controls when leaving that slot
+        // remove scatter controls & tooltip when leaving that slot
         if (ai !== 2) {
           var ctrl = document.querySelector('#vis .scatter-controls');
           if (ctrl) ctrl.remove();
+          var tt = document.getElementById('scatter-tooltip');
+          if (tt) tt.remove();
           // allow filters to be rebuilt next time
           manager._filtersBuilt = false;
         }

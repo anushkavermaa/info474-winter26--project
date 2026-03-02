@@ -168,7 +168,7 @@
     }
 
     function buildFilterOptions(manager) {
-        if (!manager._vizScatterData || manager._filtersBuilt) return;
+        if (!manager._vizScatterLoaded || !manager._vizScatterData || manager._filtersBuilt) return;
         ensureFilters(manager);
         var areas = new Set();
         var cuisines = new Set();
@@ -197,41 +197,44 @@
         manager._filtersBuilt = true;
     }
 
+    // HTML tooltip element floats above filters
+    function ensureTooltip(manager) {
+        var container = document.getElementById('vis');
+        if (!container || document.getElementById('scatter-tooltip')) return;
+        var div = document.createElement('div');
+        div.id = 'scatter-tooltip';
+        div.style.position = 'absolute';
+        div.style.pointerEvents = 'none';
+        div.style.zIndex = '1000';
+        div.style.background = 'rgba(25,25,25,0.9)';
+        div.style.color = '#fff';
+        div.style.padding = '6px 8px';
+        div.style.borderRadius = '4px';
+        div.style.fontSize = '12px';
+        div.style.display = 'none';
+        container.appendChild(div);
+    }
+
     function drawTooltip(p, manager, item) {
-        if (!item) return;
+        ensureTooltip(manager);
+        var tt = document.getElementById('scatter-tooltip');
+        if (!tt || !item) {
+            if (tt) tt.style.display = 'none';
+            return;
+        }
         var lines = [
             'Rating: ' + item.rating.toFixed(1),
             'Reviews: ' + item.count,
             'Area: ' + item.area,
             'Cuisine: ' + item.cuisine,
-            (item.gem ? 'Hidden Gem: Yes' : '')
-        ].filter(function(l) { return l.length > 0; });
-        p.push();
-        p.textSize(12);
-        p.textAlign(p.LEFT, p.TOP);
-        var padX = 10, padY = 8, lineH = 15;
-        var maxW = 0;
-        for (var i = 0; i < lines.length; i++) {
-            maxW = Math.max(maxW, p.textWidth(lines[i]));
-        }
-        var boxW = maxW + padX * 2;
-        var boxH = lines.length * lineH + padY * 2;
+            (item.gem ? 'Hidden Gem' : '')
+        ].filter(function(l) { return l && l.length; });
+        tt.innerHTML = lines.join('<br>');
         var x = p.mouseX + 14;
-        var y = p.mouseY - boxH - 8;
-        var boundW = manager.canvasWidth || p.width;
-        var boundH = manager.canvasHeight || p.height;
-        if (x + boxW > boundW - 6) x = boundW - boxW - 6;
-        if (y < 6) y = p.mouseY + 10;
-        if (y + boxH > boundH - 6) y = boundH - boxH - 6;
-
-        p.noStroke();
-        p.fill(25, 25, 25, 235);
-        p.rect(x, y, boxW, boxH, 6);
-        p.fill(255);
-        for (var j = 0; j < lines.length; j++) {
-            p.text(lines[j], x + padX, y + padY + j * lineH);
-        }
-        p.pop();
+        var y = p.mouseY - 8;
+        tt.style.left = x + 'px';
+        tt.style.top = y + 'px';
+        tt.style.display = 'block';
     }
 
     window.VizScatter = {
