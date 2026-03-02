@@ -21,6 +21,13 @@
           window.VizBar.draw(p, manager, ai, progress);
           return;
         }
+
+        // Replace viz_4 screenshot with a real chart.
+        // ai=3 maps to imageFiles[3] which was "images/viz_4.png".
+        if (ai === 3 && window.VizPriceRating && typeof window.VizPriceRating.draw === 'function') {
+          window.VizPriceRating.draw(p, manager, ai, progress);
+          return;
+        }
   
         // load images (only once each)
         for (let i = 0; i < imageFiles.length; i++) {
