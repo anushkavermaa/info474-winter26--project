@@ -341,10 +341,15 @@
                 }
             }
 
-            // x ticks
-            var xticks = 6;
-            for (var t = 0; t <= xticks; t++) {
-                var ratio = t / xticks;
+            // x ticks: choose a nice constant step based on the current maximum
+            // label every 1000; compute how many ticks we need so no multiples are skipped
+            var step = 1000;
+            if (xMax < step) {
+                // if max is smaller than step, just draw one tick at the max
+                step = xMax;
+            }
+            for (var value = 0; value <= xMax; value += step) {
+                var ratio = xMax > 0 ? value / xMax : 0;
                 var tx = p.lerp(chart.left, chart.right, ratio);
                 p.stroke(235);
                 p.line(tx, chart.top, tx, chart.bottom);
@@ -352,7 +357,7 @@
                 p.fill(105);
                 p.textSize(11);
                 p.textAlign(p.CENTER, p.TOP);
-                p.text(Math.round(p.lerp(xMin, xMax, ratio)), tx, chart.bottom + 6);
+                p.text(Math.round(value), tx, chart.bottom + 6);
             }
 
             // draw points
@@ -385,9 +390,8 @@
             p.text('Review Count', (chart.left + chart.right) / 2, chart.bottom + 46);
             p.textStyle(p.NORMAL);
 
-            if (hovered) {
-                drawTooltip(p, manager, hovered);
-            }
+            // draw tooltip regardless; passing null will cause it to hide
+            drawTooltip(p, manager, hovered);
 
             p.pop();
         }
