@@ -276,12 +276,12 @@
             var chart = {
                 left: panelLeft + 60,
                 right: panelLeft + panelWidth - 160,
-                top: panelTop + 100,
-                bottom: panelTop + 250
+                top: panelTop + 120,
+                bottom: panelTop + 290
             };
 
-            // fixed y range 4.5-5 (only high ratings) and compute nice x max
-            var yMin = 4.5;
+            // fixed y range 4.0-5 (only high ratings will be plotted >= 4.5) and compute nice x max
+            var yMin = 4.0;
             var yMax = 5;
             var maxCount = 0;
             for (var i = 0; i < points.length; i++) {
@@ -308,30 +308,34 @@
             p.noStroke();
             p.textSize(12);
             var controlsRightX = chart.right + 20;
-            var controlsTopY = chart.top + 60;
-            // normal point
-            p.fill(80);
-            p.ellipse(controlsRightX, controlsTopY + 12, 8, 8);
+            var controlsTopY = chart.top - 25;
+            // hidden gems first (capitalized)
+            p.fill(p.color(0,100,0));
+            p.ellipse(controlsRightX, controlsTopY, 8, 8);
             p.fill(105);
             p.textAlign(p.LEFT, p.CENTER);
-            p.text('other', controlsRightX + 12, controlsTopY + 12);
-            // hidden gem
-            p.fill(p.color(0,100,0));
-            p.ellipse(controlsRightX, controlsTopY + 32, 8, 8);
+            p.text('Hidden Gems', controlsRightX + 12, controlsTopY);
+            // other (capitalized)
+            p.fill(80);
+            p.ellipse(controlsRightX, controlsTopY + 20, 8, 8);
             p.fill(105);
-            p.text('hidden gem', controlsRightX + 12, controlsTopY + 32);
+            p.text('Other', controlsRightX + 12, controlsTopY + 20);
             p.pop();
 
-            // y ticks
-            for (var yTick = yMin; yTick <= yMax + 0.001; yTick += 0.5) {
+            // y ticks (only label 4.5 and 5.0, but draw gridline for 4.0)
+            for (var yTick = yMin; yTick <= yMax + 0.001; yTick += 0.25) {
                 var ty = p.map(yTick, yMin, yMax, chart.bottom, chart.top);
+                // gridline for all ticks
                 p.stroke(235);
                 p.line(chart.left, ty, chart.right, ty);
-                p.noStroke();
-                p.fill(105);
-                p.textSize(11);
-                p.textAlign(p.RIGHT, p.CENTER);
-                p.text(yTick.toFixed(1), chart.left - 8, ty);
+                // label only for 4.5 and 5.0
+                if (yTick === 4.5 || yTick === 5.0) {
+                    p.noStroke();
+                    p.fill(105);
+                    p.textSize(11);
+                    p.textAlign(p.RIGHT, p.CENTER);
+                    p.text(yTick.toFixed(1), chart.left - 8, ty);
+                }
             }
 
             // x ticks
@@ -372,7 +376,7 @@
             p.textSize(13);
             p.textStyle(p.BOLD);
             p.textAlign(p.LEFT, p.BOTTOM);
-            p.text('Star Rating', panelLeft + 8, chart.top - 8);
+            p.text('Star Rating', panelLeft + 8, chart.top - 25);
 
             p.textAlign(p.CENTER, p.BASELINE);
             p.text('Review Count', (chart.left + chart.right) / 2, chart.bottom + 46);

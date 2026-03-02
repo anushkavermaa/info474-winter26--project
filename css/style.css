@@ -132,7 +132,7 @@ body {
 /* scatter plot filter controls */
 #vis .scatter-controls {
   position: absolute;
-  top: 180px;
+  top: 140px;
   right: 25px;
   display: flex;
   flex-direction: column;
