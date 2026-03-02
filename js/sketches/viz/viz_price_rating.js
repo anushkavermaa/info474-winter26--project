@@ -324,12 +324,6 @@
                 p.line(x - boxW / 2, yMean, x + boxW / 2, yMean);
                 p.strokeWeight(1);
 
-                for (var o = 0; o < item.outliers.length; o++) {
-                    var outY = p.map(item.outliers[o], yMin, yMax, chart.bottom, chart.top);
-                    p.fill(130, 50, 30);
-                    p.ellipse(x, outY, 5, 5);
-                }
-
                 p.noStroke();
                 p.fill(30);
                 p.textSize(12);
@@ -357,7 +351,6 @@
                     'Q3: ' + hovered.q3.toFixed(2),
                     'Whisker Low: ' + hovered.whiskerLow.toFixed(2),
                     'Whisker High: ' + hovered.whiskerHigh.toFixed(2),
-                    'Outliers: ' + hovered.outliers.length,
                     'n: ' + hovered.count
                 ]);
             }
