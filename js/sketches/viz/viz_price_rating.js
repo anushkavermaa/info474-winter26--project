@@ -185,6 +185,43 @@
         p.pop();
     }
 
+    function drawTooltip(p, manager, lines) {
+        if (!lines || !lines.length) return;
+
+        p.push();
+        p.textSize(12);
+        p.textAlign(p.LEFT, p.TOP);
+
+        var padX = 10;
+        var padY = 8;
+        var lineH = 15;
+        var maxWidth = 0;
+        for (var i = 0; i < lines.length; i++) {
+            maxWidth = Math.max(maxWidth, p.textWidth(lines[i]));
+        }
+
+        var boxW = maxWidth + padX * 2;
+        var boxH = lines.length * lineH + padY * 2;
+        var x = p.mouseX + 14;
+        var y = p.mouseY - boxH - 8;
+
+        var boundW = manager.canvasWidth || p.width;
+        var boundH = manager.canvasHeight || p.height;
+        if (x + boxW > boundW - 6) x = boundW - boxW - 6;
+        if (y < 6) y = p.mouseY + 10;
+        if (y + boxH > boundH - 6) y = boundH - boxH - 6;
+
+        p.noStroke();
+        p.fill(25, 25, 25, 235);
+        p.rect(x, y, boxW, boxH);
+
+        p.fill(255);
+        for (var j = 0; j < lines.length; j++) {
+            p.text(lines[j], x + padX, y + padY + j * lineH);
+        }
+        p.pop();
+    }
+
     window.VizPriceRating = {
         draw: function (p, manager, ai, progress) {
             ensureData(manager);
@@ -244,6 +281,7 @@
             var span = Math.max(1, points.length - 1);
             var centerX = (chart.left + chart.right) / 2;
             var step = 72;
+            var hovered = null;
             p.textStyle(p.NORMAL);
 
             for (var i = 0; i < points.length; i++) {
@@ -256,6 +294,12 @@
                 var yHigh = p.map(item.whiskerHigh, yMin, yMax, chart.bottom, chart.top);
                 var yMean = p.map(item.mean, yMin, yMax, chart.bottom, chart.top);
                 var boxW = 54;
+                var hitLeft = x - boxW / 2 - 8;
+                var hitRight = x + boxW / 2 + 8;
+                var hitTop = Math.min(yHigh, yLow);
+                var hitBottom = Math.max(yHigh, yLow);
+                var isHover = p.mouseX >= hitLeft && p.mouseX <= hitRight && p.mouseY >= hitTop && p.mouseY <= hitBottom;
+                if (isHover) hovered = item;
 
                 p.stroke(80, 120, 80);
                 p.line(x, yHigh, x, yQ3);
@@ -265,7 +309,7 @@
 
                 p.stroke(0);
                 p.strokeWeight(1);
-                p.fill(0, 110, 0, 170);
+                p.fill(isHover ? p.color(0, 125, 0, 190) : p.color(0, 110, 0, 170));
                 p.rectMode(p.CENTER);
                 p.rect(x, (yQ1 + yQ3) / 2, boxW, Math.max(2, yQ1 - yQ3));
                 p.rectMode(p.CORNER);
@@ -303,6 +347,20 @@
             p.textAlign(p.CENTER, p.BASELINE);
             p.text('Price', (chart.left + chart.right) / 2, chart.bottom + 46);
             p.textStyle(p.NORMAL);
+
+            if (hovered) {
+                drawTooltip(p, manager, [
+                    'Price: ' + hovered.price,
+                    'Mean: ' + hovered.mean.toFixed(2),
+                    'Median: ' + hovered.median.toFixed(2),
+                    'Q1: ' + hovered.q1.toFixed(2),
+                    'Q3: ' + hovered.q3.toFixed(2),
+                    'Whisker Low: ' + hovered.whiskerLow.toFixed(2),
+                    'Whisker High: ' + hovered.whiskerHigh.toFixed(2),
+                    'Outliers: ' + hovered.outliers.length,
+                    'n: ' + hovered.count
+                ]);
+            }
             p.pop();
         }
     };
