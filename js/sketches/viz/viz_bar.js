@@ -164,6 +164,51 @@
         p.pop();
     }
 
+    function drawFittedTitle(p, text, x, y, maxWidth) {
+        var size = 25;
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.fill(28);
+        p.noStroke();
+
+        while (size > 14) {
+            p.textSize(size);
+            if (p.textWidth(text) <= maxWidth) break;
+            size -= 1;
+        }
+
+        p.text(text, x, y);
+    }
+
+    function drawTooltip(p, manager, textLine1, textLine2) {
+        var padX = 10;
+        var padY = 8;
+        var lineGap = 5;
+        var x = p.mouseX + 14;
+        var y = p.mouseY - 10;
+
+        p.push();
+        p.textSize(12);
+        p.textAlign(p.LEFT, p.TOP);
+
+        var w = Math.max(p.textWidth(textLine1), p.textWidth(textLine2)) + padX * 2;
+        var h = 12 + 12 + lineGap + padY * 2;
+
+        var maxX = (manager.canvasWidth || p.width) - w - 6;
+        var maxY = (manager.canvasHeight || p.height) - h - 6;
+        x = Math.min(Math.max(6, x), Math.max(6, maxX));
+        y = Math.min(Math.max(6, y), Math.max(6, maxY));
+
+        p.noStroke();
+        p.fill(33, 33, 33, 230);
+        p.rect(x, y, w, h, 6);
+
+        p.fill(255);
+        p.text(textLine1, x + padX, y + padY);
+        p.fill(215);
+        p.text(textLine2, x + padX, y + padY + 12 + lineGap);
+        p.pop();
+    }
+
     window.VizBar = {
         draw: function (p, manager, ai, progress) {
             ensureData(manager);
@@ -204,13 +249,14 @@
             var y1 = y0 + areaCounts.length * (chart.barH + chart.gap) - chart.gap;
             var plotW = Math.max(1, x1 - x0);
             var niceMax = Math.max(1, manager._vizBarMax || 1);
+            var titleText = "Seattle's Most Diverse Food Neighborhoods";
+            var titleX = panelLeft + 8;
+            var titleY = panelTop + 38;
+            var titleMaxWidth = panelWidth - 16;
+            var hovered = null;
 
             p.push();
-            p.noStroke();
-            p.fill(28);
-            p.textSize(25);
-            p.textAlign(p.LEFT, p.BASELINE);
-            p.text("Seattle's Most Diverse Food Neighborhoods", x0, panelTop + 38);
+            drawFittedTitle(p, titleText, titleX, titleY, titleMaxWidth);
 
             p.stroke(225);
             p.line(x0, y1 + 8, x1, y1 + 8);
@@ -239,6 +285,7 @@
                 var item = areaCounts[i];
                 var y = y0 + i * (chart.barH + chart.gap);
                 var barW = p.map(item.count, 0, niceMax, 0, plotW);
+                var isHover = p.mouseX >= x0 && p.mouseX <= x0 + barW && p.mouseY >= y && p.mouseY <= y + chart.barH;
 
                 p.noStroke();
                 p.fill(90);
@@ -246,12 +293,16 @@
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(item.area, panelLeft + 8, y + chart.barH / 2);
 
-                p.fill(0, 100, 0);
+                p.fill(isHover ? p.color(0, 120, 0) : p.color(0, 100, 0));
                 p.rect(x0, y, barW, chart.barH, 2);
 
                 p.fill(22);
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(item.count, x0 + barW + 8, y + chart.barH / 2);
+
+                if (isHover) {
+                    hovered = item;
+                }
             }
 
             p.fill(80);
@@ -259,6 +310,15 @@
             p.textSize(14);
             p.textAlign(p.CENTER, p.BASELINE);
             p.text('Number of Distinct Cuisines', (x0 + x1) / 2, panelTop + panelHeight - 16);
+
+            if (hovered) {
+                drawTooltip(
+                    p,
+                    manager,
+                    hovered.area,
+                    'Distinct cuisines: ' + hovered.count
+                );
+            }
             p.pop();
         }
     };
