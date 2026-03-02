@@ -14,6 +14,13 @@
   
     window.VizTitle = {
       draw: function (p, manager, ai, progress) {
+
+        // Replace viz_2 screenshot with the real chart visualization.
+        // ai=1 maps to imageFiles[1] which was "images/viz_2.png".
+        if (ai === 1 && window.VizBar && typeof window.VizBar.draw === 'function') {
+          window.VizBar.draw(p, manager, ai, progress);
+          return;
+        }
   
         // load images (only once each)
         for (let i = 0; i < imageFiles.length; i++) {
