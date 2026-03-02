@@ -15,6 +15,17 @@
     window.VizTitle = {
       draw: function (p, manager, ai, progress) {
 
+        if (ai !== 0 && window.VizMap && typeof window.VizMap.hide === 'function') {
+          window.VizMap.hide(p);
+        }
+
+        // Show map as the first visualization.
+        // ai=0 is the first section/visual slot.
+        if (ai === 0 && window.VizMap && typeof window.VizMap.draw === 'function') {
+          window.VizMap.draw(p, manager, ai, progress);
+          return;
+        }
+
         // Replace viz_2 screenshot with the real chart visualization.
         // ai=1 maps to imageFiles[1] which was "images/viz_2.png".
         if (ai === 1 && window.VizBar && typeof window.VizBar.draw === 'function') {
