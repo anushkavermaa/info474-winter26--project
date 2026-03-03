@@ -249,6 +249,15 @@
             var panelWidth = manager.width || 600;
             var panelHeight = manager.height || 520;
 
+            // overall title (match style used by other viz modules)
+            p.push();
+            p.noStroke();
+            p.fill(28);
+            p.textAlign(p.LEFT, p.BASELINE);
+            p.textSize(24);
+            p.text('Top 5 Restaurants Based on Category', panelLeft + 5, panelTop + 40);
+            p.pop();
+
             var sectionGap = 160; // more vertical space between categories
             var lineH = 20;
             var filterHeight = 30; // approximate control height
