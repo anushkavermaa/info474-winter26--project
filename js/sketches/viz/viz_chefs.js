@@ -134,39 +134,29 @@
     function ensureFilters(manager) {
         var container = document.getElementById('vis');
         if (!container || document.getElementById('chef-budget-filter')) return;
-        var div = document.createElement('div');
-        div.className = 'chef-controls';
 
-        var label;
-        label = document.createElement('label');
-        label.textContent = 'Budget:';
-        div.appendChild(label);
-        var budgetSel = document.createElement('select');
-        budgetSel.id = 'chef-budget-filter';
-        budgetSel.innerHTML = '<option value="">All</option>';
-        div.appendChild(budgetSel);
+        function makeControl(id, labelText) {
+            var div = document.createElement('div');
+            div.className = 'chef-filter-row';
+            var label = document.createElement('label');
+            label.textContent = labelText;
+            div.appendChild(label);
+            var sel = document.createElement('select');
+            sel.id = id;
+            sel.innerHTML = '<option value="">All</option>';
+            div.appendChild(sel);
+            container.appendChild(div);
+            return sel;
+        }
 
-        label = document.createElement('label');
-        label.textContent = 'Cuisine:';
-        div.appendChild(label);
-        var cuisineSel = document.createElement('select');
-        cuisineSel.id = 'chef-cuisine-filter';
-        cuisineSel.innerHTML = '<option value="">All</option>';
-        div.appendChild(cuisineSel);
-
-        label = document.createElement('label');
-        label.textContent = 'Area:';
-        div.appendChild(label);
-        var areaSel = document.createElement('select');
-        areaSel.id = 'chef-area-filter';
-        areaSel.innerHTML = '<option value="">All</option>';
-        div.appendChild(areaSel);
-
-        container.appendChild(div);
+        var budgetSel = makeControl('chef-budget-filter', 'Budget:');
+        var cuisineSel = makeControl('chef-cuisine-filter', 'Cuisine:');
+        var areaSel = makeControl('chef-area-filter', 'Area:');
 
         [budgetSel, cuisineSel, areaSel].forEach(function (sel) {
             sel.addEventListener('change', function () { manager._filterDirty = true; });
         });
+        positionFilters(manager);
     }
 
     function buildFilterOptions(manager) {
@@ -210,6 +200,8 @@
             });
         }
 
+        // reposition now that filters exist
+        positionFilters(manager);
         manager._chefsFiltersBuilt = true;
     }
 
@@ -246,6 +238,7 @@
             var budgetVal = document.getElementById('chef-budget-filter') && document.getElementById('chef-budget-filter').value;
             var cuisineVal = document.getElementById('chef-cuisine-filter') && document.getElementById('chef-cuisine-filter').value;
             var areaVal = document.getElementById('chef-area-filter') && document.getElementById('chef-area-filter').value;
+            positionFilters(manager);
 
             var topBudget = rankTop5(data, 'price', budgetVal);
             var topCuisine = rankTop5(data, 'cuisine', cuisineVal);
@@ -255,31 +248,56 @@
             var panelTop = manager.offsetY || 0;
             var panelWidth = manager.width || 600;
             var panelHeight = manager.height || 520;
-            var colWidth = panelWidth / 3;
 
-            // keep lists below the filter controls; filters occupy roughly 60px
-            var filterHeight = 60;
-            var headerY = panelTop + filterHeight + 10;
-            var listStartY = headerY + 30;
+            var sectionGap = 160; // more vertical space between categories
+            var lineH = 20;
+            var filterHeight = 30; // approximate control height
+            var startY = panelTop + 60 + 10 + filterHeight; // lists start below filters
 
             p.push();
-            p.fill(28);
+            p.fill(0);
             p.textAlign(p.LEFT, p.TOP);
-            p.textSize(18);
-            p.text('Budget', panelLeft + 5, headerY);
-            p.text('Cuisine', panelLeft + colWidth + 5, headerY);
-            p.text('Area', panelLeft + colWidth * 2 + 5, headerY);
-
             p.textSize(14);
-            var lineH = 20;
+
+            // budget section
             for (var i = 0; i < 5; i++) {
-                var y = listStartY + i * lineH;
-                p.fill(0);
+                var y = startY + i * lineH;
                 p.text(topBudget[i] || '', panelLeft + 5, y);
-                p.text(topCuisine[i] || '', panelLeft + colWidth + 5, y);
-                p.text(topArea[i] || '', panelLeft + colWidth * 2 + 5, y);
+            }
+
+            // cuisine section
+            var cuisineY = startY + sectionGap;
+            for (var i = 0; i < 5; i++) {
+                var y = cuisineY + i * lineH;
+                p.text(topCuisine[i] || '', panelLeft + 5, y);
+            }
+
+            // area section
+            var areaY = cuisineY + sectionGap;
+            for (var i = 0; i < 5; i++) {
+                var y = areaY + i * lineH;
+                p.text(topArea[i] || '', panelLeft + 5, y);
             }
             p.pop();
         }
     };
+
+
+    function positionFilters(manager) {
+        var panelTop = manager.offsetY || 0;
+        var filterHeight = 30;
+        var startY = panelTop + 60 + 10 + filterHeight; // match draw startY
+        var sectionGap = 160;
+        var offset = filterHeight + 8; // bigger gap above filter rows
+        var rows = [startY, startY + sectionGap, startY + 2 * sectionGap];
+        var ids = ['chef-budget-filter', 'chef-cuisine-filter', 'chef-area-filter'];
+        for (var i = 0; i < ids.length; i++) {
+            var ctrl = document.getElementById(ids[i]);
+            if (ctrl && ctrl.parentElement && ctrl.parentElement.classList.contains('chef-filter-row')) {
+                var div = ctrl.parentElement;
+                div.style.top = (rows[i] - offset) + 'px';
+                div.style.left = '20px';
+            }
+        }
+    }
 })();

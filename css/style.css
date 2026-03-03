@@ -145,25 +145,38 @@ body {
   width: 110px;
 }
 
-/* chef recommendations filter controls */
-#vis .chef-controls {
+/* chef recommendations filter controls (vertical rows) */
+#vis .chef-filter-row {
   position: absolute;
-  top: 60px;
-  left: 20px;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   z-index: 200;
 }
-#vis .chef-controls label {
+#vis .chef-filter-row label {
   font-size: 12px;
-  margin-right: 4px;
 }
-#vis .chef-controls select {
+#vis .chef-filter-row select {
   font-size: 12px;
   padding: 4px 6px;
   min-width: 90px;
 }
+
+#vis .chef-filter-row {
+  position: absolute;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+#vis .chef-filter-row label {
+  font-size: 12px;
+}
+#vis .chef-filter-row select {
+  font-size: 12px;
+  padding: 4px 6px;
+  min-width: 90px;
+}
+
 
 .axis path,
 .axis line {

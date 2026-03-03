@@ -28,10 +28,10 @@
           // allow filters to be rebuilt next time
           manager._filtersBuilt = false;
         }
-        // remove chef controls when leaving the course 4 slot
+        // remove chef filters when leaving the course 4 slot
         if (ai !== 4) {
-          var chefCtrl = document.querySelector('#vis .chef-controls');
-          if (chefCtrl) chefCtrl.remove();
+          var rows = document.querySelectorAll('#vis .chef-filter-row');
+          rows.forEach(function (r) { r.remove(); });
           manager._chefsFiltersBuilt = false;
         }
 
