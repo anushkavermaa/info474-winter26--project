@@ -211,7 +211,50 @@
             return d.count >= 100;
         });
         arr.sort(function (a, b) { return b.star - a.star; });
-        return arr.slice(0, 5).map(function (d) { return d.name; });
+        return arr.slice(0, 5); // return full objects, not just names
+    }
+
+    function ensureTooltip(manager) {
+        var container = document.getElementById('vis');
+        if (!container || document.getElementById('chef-tooltip')) return;
+        var div = document.createElement('div');
+        div.id = 'chef-tooltip';
+        div.style.position = 'absolute';
+        div.style.pointerEvents = 'none';
+        div.style.zIndex = '1000';
+        div.style.background = 'rgba(25,25,25,0.9)';
+        div.style.color = '#fff';
+        div.style.padding = '6px 8px';
+        div.style.borderRadius = '4px';
+        div.style.fontSize = '12px';
+        div.style.display = 'none';
+        container.appendChild(div);
+    }
+
+    function showTooltip(p, manager, restaurant) {
+        ensureTooltip(manager);
+        var tt = document.getElementById('chef-tooltip');
+        if (!tt || !restaurant) {
+            if (tt) tt.style.display = 'none';
+            return;
+        }
+        var lines = [
+            'Rating: ' + restaurant.star.toFixed(1),
+            'Reviews: ' + restaurant.count,
+            'Cuisine: ' + restaurant.cuisine,
+            'Area: ' + restaurant.area
+        ].filter(function(l) { return l && l.length; });
+        tt.innerHTML = lines.join('<br>');
+        var x = p.mouseX + 14;
+        var y = p.mouseY - 8;
+        tt.style.left = x + 'px';
+        tt.style.top = y + 'px';
+        tt.style.display = 'block';
+    }
+
+    function hideTooltip() {
+        var tt = document.getElementById('chef-tooltip');
+        if (tt) tt.style.display = 'none';
     }
 
     window.VizChefs = {
@@ -263,31 +306,56 @@
             var filterHeight = 30; // approximate control height
             var startY = panelTop + 60 + 10 + filterHeight; // lists start below filters
 
+            var hoveredRestaurant = null;  // track which one we're hovering over
+
             p.push();
             p.fill(0);
             p.textAlign(p.LEFT, p.TOP);
             p.textSize(14);
 
+            // helper to check if mouse is hovering over a text item and show tooltip
+            function drawRestaurantItem(obj, x, y) {
+                if (!obj) return false;
+                var name = obj.name || '';
+                p.text(name, x, y);
+                var textW = p.textWidth(name);
+                // simple hit detection: check if mouse is within text bounds
+                if (p.mouseX >= x && p.mouseX <= x + textW &&
+                    p.mouseY >= y && p.mouseY <= y + lineH) {
+                    hoveredRestaurant = obj;
+                    return true;
+                }
+                return false;
+            }
+
             // budget section
             for (var i = 0; i < 5; i++) {
                 var y = startY + i * lineH;
-                p.text(topBudget[i] || '', panelLeft + 5, y);
+                drawRestaurantItem(topBudget[i], panelLeft + 5, y);
             }
 
             // cuisine section
             var cuisineY = startY + sectionGap;
             for (var i = 0; i < 5; i++) {
                 var y = cuisineY + i * lineH;
-                p.text(topCuisine[i] || '', panelLeft + 5, y);
+                drawRestaurantItem(topCuisine[i], panelLeft + 5, y);
             }
 
             // area section
             var areaY = cuisineY + sectionGap;
             for (var i = 0; i < 5; i++) {
                 var y = areaY + i * lineH;
-                p.text(topArea[i] || '', panelLeft + 5, y);
+                drawRestaurantItem(topArea[i], panelLeft + 5, y);
             }
+
             p.pop();
+
+            // show/hide tooltip based on hover
+            if (hoveredRestaurant) {
+                showTooltip(p, manager, hoveredRestaurant);
+            } else {
+                hideTooltip();
+            }
         }
     };
 

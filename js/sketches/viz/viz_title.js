@@ -28,10 +28,12 @@
           // allow filters to be rebuilt next time
           manager._filtersBuilt = false;
         }
-        // remove chef filters when leaving the course 4 slot
+        // remove chef filters and tooltip when leaving the course 4 slot
         if (ai !== 4) {
           var rows = document.querySelectorAll('#vis .chef-filter-row');
           rows.forEach(function (r) { r.remove(); });
+          var tooltip = document.getElementById('chef-tooltip');
+          if (tooltip) tooltip.remove();
           manager._chefsFiltersBuilt = false;
         }
 
