@@ -145,6 +145,26 @@ body {
   width: 110px;
 }
 
+/* chef recommendations filter controls */
+#vis .chef-controls {
+  position: absolute;
+  top: 60px;
+  left: 20px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 200;
+}
+#vis .chef-controls label {
+  font-size: 12px;
+  margin-right: 4px;
+}
+#vis .chef-controls select {
+  font-size: 12px;
+  padding: 4px 6px;
+  min-width: 90px;
+}
+
 .axis path,
 .axis line {
   fill: none;

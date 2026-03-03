@@ -28,6 +28,12 @@
           // allow filters to be rebuilt next time
           manager._filtersBuilt = false;
         }
+        // remove chef controls when leaving the course 4 slot
+        if (ai !== 4) {
+          var chefCtrl = document.querySelector('#vis .chef-controls');
+          if (chefCtrl) chefCtrl.remove();
+          manager._chefsFiltersBuilt = false;
+        }
 
         // Show map as the first visualization.
         // ai=0 is the first section/visual slot.
@@ -53,6 +59,12 @@
         // override screenshot with real viz for some slots
         if (ai === 2 && window.VizScatter && typeof window.VizScatter.draw === 'function') {
           window.VizScatter.draw(p, manager, ai, progress);
+          return;
+        }
+
+        // if this slot is the chef recommendations, draw the custom viz
+        if (ai === 4 && window.VizChefs && typeof window.VizChefs.draw === 'function') {
+          window.VizChefs.draw(p, manager, ai, progress);
           return;
         }
 
