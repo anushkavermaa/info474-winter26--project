@@ -210,7 +210,10 @@
             if (value && d[key] !== value) return false;
             return d.count >= 100;
         });
-        arr.sort(function (a, b) { return b.star - a.star; });
+        arr.sort(function (a, b) {
+            if (b.star !== a.star) return b.star - a.star;  // primary: stars descending
+            return b.count - a.count;  // secondary: review count descending
+        });
         return arr.slice(0, 5); // return full objects, not just names
     }
 
