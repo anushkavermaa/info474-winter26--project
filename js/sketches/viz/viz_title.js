@@ -19,6 +19,10 @@
           window.VizMap.hide(p);
         }
 
+        if (ai !== 5 && window.VizMapPoints && typeof window.VizMapPoints.hide === 'function') {
+          window.VizMapPoints.hide(p);
+        }
+
         // remove scatter controls & tooltip when leaving that slot
         if (ai !== 2) {
           var ctrl = document.querySelector('#vis .scatter-controls');
@@ -67,6 +71,12 @@
         // if this slot is the chef recommendations, draw the custom viz
         if (ai === 4 && window.VizChefs && typeof window.VizChefs.draw === 'function') {
           window.VizChefs.draw(p, manager, ai, progress);
+          return;
+        }
+
+        // Final dessert section: point map from latitude/longitude.
+        if (ai === 5 && window.VizMapPoints && typeof window.VizMapPoints.draw === 'function') {
+          window.VizMapPoints.draw(p, manager, ai, progress);
           return;
         }
 
