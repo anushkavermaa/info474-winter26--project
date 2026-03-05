@@ -40,7 +40,7 @@
                 triggerY = window.pageYOffset + 10;
             }
 
-            var sectionIndex = 0;
+            var sectionIndex = -1;
             for (var i = 0; i < self.sectionPositions.length; i++) {
                 if (triggerY >= self.sectionPositions[i]) sectionIndex = i;
                 else break;

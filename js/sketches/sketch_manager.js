@@ -55,8 +55,12 @@ function startP5() {
 
     // simple drawing routine, split into helpers for clarity
     SketchManager.prototype.draw = function (p) {
-        var ai = this.state.activeIndex || 0;
-        var progress = this.state.progress || 0;
+        var ai = (this.state.activeIndex !== undefined && this.state.activeIndex !== null)
+            ? this.state.activeIndex
+            : 0;
+        var progress = (this.state.progress !== undefined && this.state.progress !== null)
+            ? this.state.progress
+            : 0;
         localRenderer.draw(p, this, ai, progress);
     };
 
