@@ -93,7 +93,7 @@ body {
 #vis {
   display: inline-block;
   position: fixed;
-  top: 152px;
+  top: 56px;
   z-index: 100;
   margin-left: 32px;
 }
