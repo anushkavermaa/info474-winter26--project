@@ -138,12 +138,14 @@
         function makeControl(id, labelText) {
             var div = document.createElement('div');
             div.className = 'chef-filter-row';
-            var label = document.createElement('label');
-            label.textContent = labelText;
-            div.appendChild(label);
+            div.style.display = 'flex';
+            div.style.flexDirection = 'column';
+            div.style.alignItems = 'flex-start';
+            div.style.gap = '3px';
             var sel = document.createElement('select');
             sel.id = id;
             sel.innerHTML = '<option value="">All</option>';
+            sel.style.width = '100%';
             div.appendChild(sel);
             container.appendChild(div);
             return sel;
@@ -242,6 +244,7 @@
             return;
         }
         var lines = [
+            'Name: ' + restaurant.name,
             'Rating: ' + restaurant.star.toFixed(1),
             'Reviews: ' + restaurant.count,
             'Cuisine: ' + restaurant.cuisine,
@@ -258,6 +261,46 @@
     function hideTooltip() {
         var tt = document.getElementById('chef-tooltip');
         if (tt) tt.style.display = 'none';
+    }
+
+    function truncateLabel(text, maxChars) {
+        var s = String(text || '');
+        if (s.length <= maxChars) return s;
+        return s.slice(0, Math.max(0, maxChars - 3)) + '...';
+    }
+
+    function drawCategoryIcon(p, cx, cy, iconText) {
+        var iconColor = p.color(111, 76, 44);
+        p.push();
+        p.noStroke();
+        p.fill(235, 217, 193);
+        p.ellipse(cx, cy, 24, 24);
+
+        if (iconText === 'pin') {
+            // simple map-pin glyph
+            p.fill(iconColor);
+            p.ellipse(cx, cy - 2, 9, 9);
+            p.triangle(cx - 3, cy + 1, cx + 3, cy + 1, cx, cy + 7);
+            p.fill(245, 232, 214);
+            p.ellipse(cx, cy - 2, 3, 3);
+        } else if (iconText === 'burger') {
+            // simple burger glyph
+            p.fill(iconColor);
+            p.arc(cx, cy - 1, 10, 7, Math.PI, 0, p.CHORD);
+            p.rect(cx - 5, cy, 10, 2, 1);
+            p.rect(cx - 4, cy + 3, 8, 2, 1);
+        } else if (iconText === '$') {
+            p.fill(iconColor);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.textSize(12);
+            p.text('$', cx, cy + 1);
+        } else {
+            p.fill(iconColor);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.textSize(12);
+            p.text(iconText, cx, cy + 1);
+        }
+        p.pop();
     }
 
     window.VizChefs = {
@@ -290,67 +333,93 @@
             var topCuisine = rankTop5(data, 'cuisine', cuisineVal);
             var topArea = rankTop5(data, 'area', areaVal);
 
-            var panelLeft = manager.offsetX || 20;
-            var panelTop = manager.offsetY || 0;
             var panelWidth = manager.width || 600;
             var panelHeight = manager.height || 520;
+            var canvasWidth = manager.canvasWidth || p.width;
+            var canvasHeight = manager.canvasHeight || p.height;
+            var panelLeft = Math.max(0, (canvasWidth - panelWidth) / 2);
+            var panelTop = Math.max(0, (canvasHeight - panelHeight) / 2);
 
-            // overall title (match style used by other viz modules)
             p.push();
             p.noStroke();
             p.fill(28);
             p.textAlign(p.LEFT, p.BASELINE);
-            p.textSize(24);
+            p.textSize(22);
             p.text('Top 5 Restaurants Based on Category', panelLeft + 5, panelTop + 40);
             p.pop();
 
-            var sectionGap = 160; // more vertical space between categories
-            var lineH = 20;
-            var filterHeight = 30; // approximate control height
-            var startY = panelTop + 60 + 10 + filterHeight; // lists start below filters
+            var cardsTop = panelTop + 100;
+            var cardsHeight = panelHeight - 120;
+            var cardGap = 12;
+            var cardWidth = (panelWidth - cardGap * 2) / 3;
+            var rowH = 56;
+            var listStartOffset = 96;
+            var hoveredRestaurant = null;
 
-            var hoveredRestaurant = null;  // track which one we're hovering over
+            var categories = [
+                { title: 'Budget Picks', icon: '$', items: topBudget },
+                { title: 'Cuisine Picks', icon: 'burger', items: topCuisine },
+                { title: 'Area Picks', icon: 'pin', items: topArea }
+            ];
 
             p.push();
-            p.fill(0);
-            p.textAlign(p.LEFT, p.TOP);
-            p.textSize(14);
+            for (var c = 0; c < categories.length; c++) {
+                var cat = categories[c];
+                var cardX = panelLeft + c * (cardWidth + cardGap);
+                var cardY = cardsTop;
 
-            // helper to check if mouse is hovering over a text item and show tooltip
-            function drawRestaurantItem(obj, x, y) {
-                if (!obj) return false;
-                var name = obj.name || '';
-                p.text(name, x, y);
-                var textW = p.textWidth(name);
-                // simple hit detection: check if mouse is within text bounds
-                if (p.mouseX >= x && p.mouseX <= x + textW &&
-                    p.mouseY >= y && p.mouseY <= y + lineH) {
-                    hoveredRestaurant = obj;
-                    return true;
+                p.noStroke();
+                p.fill(252, 246, 236);
+                p.rect(cardX, cardY, cardWidth, cardsHeight, 10);
+
+                p.stroke(216, 200, 173);
+                p.strokeWeight(1);
+                p.noFill();
+                p.rect(cardX, cardY, cardWidth, cardsHeight, 10);
+                p.noStroke();
+
+                drawCategoryIcon(p, cardX + 16, cardY + 18, cat.icon);
+                p.fill(46, 32, 20);
+                p.textAlign(p.LEFT, p.CENTER);
+                p.textSize(13);
+                p.text(cat.title, cardX + 32, cardY + 18);
+
+                for (var i = 0; i < 5; i++) {
+                    var item = cat.items[i];
+                    if (!item) continue;
+
+                    var rowX = cardX + 8;
+                    var rowY = cardY + listStartOffset + i * rowH;
+                    var rowW = cardWidth - 16;
+                    var rowHover = p.mouseX >= rowX && p.mouseX <= rowX + rowW && p.mouseY >= rowY && p.mouseY <= rowY + (rowH - 6);
+
+                    p.noStroke();
+                    p.fill(rowHover ? p.color(244, 231, 211) : p.color(247, 238, 223));
+                    p.rect(rowX, rowY, rowW, rowH - 6, 8);
+
+                    p.fill(143, 79, 36);
+                    p.ellipse(rowX + 12, rowY + 12, 18, 18);
+                    p.fill(255, 247, 235);
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.textSize(11);
+                    p.text(String(i + 1), rowX + 12, rowY + 12);
+
+                    p.fill(44, 31, 22);
+                    p.textAlign(p.LEFT, p.TOP);
+                    p.textSize(11);
+                    p.text(truncateLabel(item.name, 20), rowX + 24, rowY + 4);
+
+                    p.fill(93, 69, 47);
+                    p.textAlign(p.LEFT, p.TOP);
+                    p.textSize(10);
+                    p.text('★ ' + item.star.toFixed(1), rowX + 24, rowY + 21);
+                    p.text(item.count + ' reviews', rowX + 24, rowY + 33);
+
+                    if (rowHover) {
+                        hoveredRestaurant = item;
+                    }
                 }
-                return false;
             }
-
-            // budget section
-            for (var i = 0; i < 5; i++) {
-                var y = startY + i * lineH;
-                drawRestaurantItem(topBudget[i], panelLeft + 5, y);
-            }
-
-            // cuisine section
-            var cuisineY = startY + sectionGap;
-            for (var i = 0; i < 5; i++) {
-                var y = cuisineY + i * lineH;
-                drawRestaurantItem(topCuisine[i], panelLeft + 5, y);
-            }
-
-            // area section
-            var areaY = cuisineY + sectionGap;
-            for (var i = 0; i < 5; i++) {
-                var y = areaY + i * lineH;
-                drawRestaurantItem(topArea[i], panelLeft + 5, y);
-            }
-
             p.pop();
 
             // show/hide tooltip based on hover
@@ -364,19 +433,25 @@
 
 
     function positionFilters(manager) {
-        var panelTop = manager.offsetY || 0;
-        var filterHeight = 30;
-        var startY = panelTop + 60 + 10 + filterHeight; // match draw startY
-        var sectionGap = 160;
-        var offset = filterHeight + 8; // bigger gap above filter rows
-        var rows = [startY, startY + sectionGap, startY + 2 * sectionGap];
+        var panelWidth = manager.width || 600;
+        var panelHeight = manager.height || 520;
+        var canvasWidth = manager.canvasWidth || panelWidth;
+        var canvasHeight = manager.canvasHeight || panelHeight;
+        var panelLeft = Math.max(0, (canvasWidth - panelWidth) / 2);
+        var panelTop = Math.max(0, (canvasHeight - panelHeight) / 2);
+        var cardsTop = panelTop + 100;
+        var cardGap = 12;
+        var cardWidth = (panelWidth - cardGap * 2) / 3;
+        var filterTop = cardsTop + 40;
+
         var ids = ['chef-budget-filter', 'chef-cuisine-filter', 'chef-area-filter'];
         for (var i = 0; i < ids.length; i++) {
             var ctrl = document.getElementById(ids[i]);
             if (ctrl && ctrl.parentElement && ctrl.parentElement.classList.contains('chef-filter-row')) {
                 var div = ctrl.parentElement;
-                div.style.top = (rows[i] - offset) + 'px';
-                div.style.left = '20px';
+                div.style.top = filterTop + 'px';
+                div.style.left = (panelLeft + i * (cardWidth + cardGap) + 8) + 'px';
+                div.style.width = Math.max(120, cardWidth - 16) + 'px';
             }
         }
     }
