@@ -95,6 +95,7 @@ body {
 
 .course-body {
   display: -webkit-box;
+  line-clamp: 4;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -102,6 +103,7 @@ body {
 
 .step.expanded .course-body {
   display: block;
+  line-clamp: initial;
   -webkit-line-clamp: initial;
   -webkit-box-orient: initial;
   overflow: visible;
@@ -178,6 +180,16 @@ body {
 #vis canvas {
   display: block;
   background: rgba(255, 253, 248, 0.92);
+  border: 1px solid #d8c8ad;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(57, 41, 26, 0.12);
+}
+
+#viz-map-container,
+#viz-map-points-container {
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(57, 41, 26, 0.12);
+  overflow: hidden;
 }
 
 /* visibility helpers for popup effect controlled by VisualController */
