@@ -206,8 +206,8 @@
         div.style.position = 'absolute';
         div.style.pointerEvents = 'none';
         div.style.zIndex = '1000';
-        div.style.background = 'rgba(25,25,25,0.9)';
-        div.style.color = '#fff';
+        div.style.background = 'rgba(52, 37, 24, 0.92)';
+        div.style.color = '#fff7eb';
         div.style.padding = '6px 8px';
         div.style.borderRadius = '4px';
         div.style.fontSize = '12px';
@@ -271,10 +271,12 @@
                 return;
             }
 
-            var panelLeft = manager.offsetX || 20;
-            var panelTop = manager.offsetY || 0;
             var panelWidth = manager.width || 600;
             var panelHeight = manager.height || 520;
+            var canvasWidth = manager.canvasWidth || p.width;
+            var canvasHeight = manager.canvasHeight || p.height;
+            var panelLeft = Math.max(0, (canvasWidth - panelWidth) / 2);
+            var panelTop = Math.max(0, (canvasHeight - panelHeight) / 2);
 
             var chart = {
                 left: panelLeft + 60,
@@ -313,7 +315,7 @@
             var controlsRightX = chart.right + 20;
             var controlsTopY = chart.top - 25;
             // hidden gems first (capitalized)
-            p.fill(p.color(0,100,0));
+            p.fill(p.color('#8f4f24'));
             p.ellipse(controlsRightX, controlsTopY, 8, 8);
             p.fill(105);
             p.textAlign(p.LEFT, p.CENTER);
@@ -372,9 +374,9 @@
 
                 p.noStroke();
                 if (item.gem) {
-                    p.fill(isHover ? p.color(0,120,0,220) : p.color(0,100,0,180));
+                    p.fill(isHover ? p.color(143, 79, 36, 220) : p.color(178, 118, 69, 190));
                 } else {
-                    p.fill(80, isHover ? 120 : 100);
+                    p.fill(isHover ? p.color(131, 107, 81, 140) : p.color(131, 107, 81, 110));
                 }
                 p.ellipse(px, py, r * 2, r * 2);
             }

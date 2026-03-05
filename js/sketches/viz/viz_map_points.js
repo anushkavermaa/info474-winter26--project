@@ -115,7 +115,7 @@
         controlsContainer.style.boxSizing = "border-box";
         controlsContainer.style.padding = "8px";
         controlsContainer.style.border = "1px solid #e6d7bf";
-        controlsContainer.style.background = "rgba(255,255,255,0.6)";
+        controlsContainer.style.background = "rgba(255, 250, 241, 0.75)";
         controlsContainer.style.borderRadius = "6px";
   
         var title = document.createElement("div");
@@ -139,7 +139,7 @@
         cuisineSelect.style.padding = "8px";
         cuisineSelect.style.borderRadius = "6px";
         cuisineSelect.style.border = "1px solid #d8c8ad";
-        cuisineSelect.style.background = "#fff";
+        cuisineSelect.style.background = "#fffaf2";
         cuisineSelect.style.color = "#2d2015";
         cuisineSelect.addEventListener("change", function () {
           selectedCuisine = cuisineSelect.value || "ALL";
@@ -297,9 +297,9 @@
   
             var marker = L.circleMarker([lat, lon], {
               radius: 4,
-              color: "#2d2015",
+              color: "#6c4123",
               weight: 1,
-              fillColor: "#8f4f24",
+              fillColor: "#b27645",
               fillOpacity: 0.78,
             });
   

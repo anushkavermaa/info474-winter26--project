@@ -199,12 +199,12 @@
         y = Math.min(Math.max(6, y), Math.max(6, maxY));
 
         p.noStroke();
-        p.fill(33, 33, 33, 230);
+        p.fill(52, 37, 24, 235);
         p.rect(x, y, w, h, 6);
 
-        p.fill(255);
+        p.fill(255, 247, 235);
         p.text(textLine1, x + padX, y + padY);
-        p.fill(215);
+        p.fill(226, 207, 182);
         p.text(textLine2, x + padX, y + padY + 12 + lineGap);
         p.pop();
     }
@@ -229,10 +229,12 @@
                 return;
             }
 
-            var panelLeft = manager.offsetX || 20;
-            var panelTop = manager.offsetY || 0;
             var panelWidth = manager.width || 600;
             var panelHeight = manager.height || 520;
+            var canvasWidth = manager.canvasWidth || p.width;
+            var canvasHeight = manager.canvasHeight || p.height;
+            var panelLeft = Math.max(0, (canvasWidth - panelWidth) / 2);
+            var panelTop = Math.max(0, (canvasHeight - panelHeight) / 2);
 
             var chart = {
                 marginTop: panelTop + 72,
@@ -295,7 +297,7 @@
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(item.area, panelLeft + 8, y + chart.barH / 2);
 
-                p.fill(isHover ? p.color(0, 120, 0) : p.color(0, 100, 0));
+                p.fill(isHover ? p.color('#8f4f24') : p.color('#b27645'));
                 p.rect(x0, y, barW, chart.barH, 2);
 
                 p.fill(22);

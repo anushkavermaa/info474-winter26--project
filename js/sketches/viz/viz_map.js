@@ -167,9 +167,9 @@
 
     function interpolateColor(t) {
         t = Math.max(0, Math.min(1, t));
-        var r = Math.round(245 + (183 - 245) * t);
-        var g = Math.round(237 + (28 - 237) * t);
-        var b = Math.round(215 + (28 - 215) * t);
+        var r = Math.round(248 + (152 - 248) * t);
+        var g = Math.round(236 + (99 - 236) * t);
+        var b = Math.round(214 + (60 - 214) * t);
         return 'rgb(' + r + ',' + g + ',' + b + ')';
     }
 
@@ -185,11 +185,12 @@
         legendControl = L.control({ position: 'bottomright' });
         legendControl.onAdd = function () {
             var div = L.DomUtil.create('div', 'map-legend');
-            div.style.background = 'rgba(255,255,255,0.92)';
+            div.style.background = 'rgba(255, 250, 241, 0.94)';
             div.style.padding = '8px 10px';
-            div.style.border = '1px solid #cfcfcf';
+            div.style.border = '1px solid #d8c8ad';
             div.style.font = '12px/1.3 Arial, sans-serif';
-            div.innerHTML = '<strong>Area Heat</strong><br/><span style="color:#666;">Color = restaurant count</span><br/><span style="color:#666;">Size = neighborhood area</span>';
+            div.style.color = '#2f2923';
+            div.innerHTML = '<strong>Area Heat</strong><br/><span style="color:#6b5948;">Color = restaurant count</span><br/><span style="color:#6b5948;">Size = neighborhood area</span>';
             return div;
         };
         legendControl.addTo(map);
@@ -262,7 +263,7 @@
                     var ratio = item.count / maxCount;
                     var marker = L.circle([item.lat, item.lon], {
                         radius: areaRadius(item.area),
-                        color: '#4a2f1f',
+                        color: '#6c4123',
                         weight: 0.8,
                         fillColor: interpolateColor(ratio),
                         fillOpacity: 0.24

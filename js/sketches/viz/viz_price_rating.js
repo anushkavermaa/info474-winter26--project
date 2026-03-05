@@ -212,10 +212,10 @@
         if (y + boxH > boundH - 6) y = boundH - boxH - 6;
 
         p.noStroke();
-        p.fill(25, 25, 25, 235);
+        p.fill(52, 37, 24, 235);
         p.rect(x, y, boxW, boxH);
 
-        p.fill(255);
+        p.fill(255, 247, 235);
         for (var j = 0; j < lines.length; j++) {
             p.text(lines[j], x + padX, y + padY + j * lineH);
         }
@@ -241,10 +241,12 @@
                 return;
             }
 
-            var panelLeft = manager.offsetX || 20;
-            var panelTop = manager.offsetY || 0;
             var panelWidth = manager.width || 600;
             var panelHeight = manager.height || 520;
+            var canvasWidth = manager.canvasWidth || p.width;
+            var canvasHeight = manager.canvasHeight || p.height;
+            var panelLeft = Math.max(0, (canvasWidth - panelWidth) / 2);
+            var panelTop = Math.max(0, (canvasHeight - panelHeight) / 2);
 
             var chart = {
                 left: panelLeft + 70,
@@ -301,7 +303,7 @@
                 var isHover = p.mouseX >= hitLeft && p.mouseX <= hitRight && p.mouseY >= hitTop && p.mouseY <= hitBottom;
                 if (isHover) hovered = item;
 
-                p.stroke(80, 120, 80);
+                p.stroke(154, 106, 64);
                 p.line(x, yHigh, x, yQ3);
                 p.line(x, yQ1, x, yLow);
                 p.line(x - 11, yHigh, x + 11, yHigh);
@@ -309,7 +311,7 @@
 
                 p.stroke(0);
                 p.strokeWeight(1);
-                p.fill(isHover ? p.color(0, 125, 0, 190) : p.color(0, 110, 0, 170));
+                p.fill(isHover ? p.color(143, 79, 36, 195) : p.color(178, 118, 69, 180));
                 p.rectMode(p.CENTER);
                 p.rect(x, (yQ1 + yQ3) / 2, boxW, Math.max(2, yQ1 - yQ3));
                 p.rectMode(p.CORNER);

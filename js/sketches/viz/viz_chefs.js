@@ -225,8 +225,8 @@
         div.style.position = 'absolute';
         div.style.pointerEvents = 'none';
         div.style.zIndex = '1000';
-        div.style.background = 'rgba(25,25,25,0.9)';
-        div.style.color = '#fff';
+        div.style.background = 'rgba(52, 37, 24, 0.92)';
+        div.style.color = '#fff7eb';
         div.style.padding = '6px 8px';
         div.style.borderRadius = '4px';
         div.style.fontSize = '12px';
