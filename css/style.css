@@ -208,6 +208,12 @@ body {
   overflow: hidden;
 }
 
+#viz-map-points-ui {
+  border-radius: 12px;
+  box-shadow: 0 10px 24px var(--shadow);
+  overflow: hidden;
+}
+
 /* visibility helpers for popup effect controlled by VisualController */
 .vis-hidden {
   opacity: 0;
