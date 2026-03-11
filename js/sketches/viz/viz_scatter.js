@@ -122,7 +122,7 @@
                 manager._vizScatterError = processed.error;
                 manager._vizScatterLoaded = true;
                 manager._vizScatterLoading = false;
-                buildFilterOptions(manager);
+                
             })
             .catch(function (err) {
                 manager._vizScatterData = [];
@@ -247,6 +247,9 @@
                 drawMessage(p, manager, 'Loading scatter plot...');
                 return;
             }
+            if (manager._vizScatterLoaded && !manager._filtersBuilt) {
+                buildFilterOptions(manager);
+    }
             if (manager._vizScatterError) {
                 drawMessage(p, manager, manager._vizScatterError);
                 return;
