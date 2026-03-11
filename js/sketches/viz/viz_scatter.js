@@ -91,7 +91,7 @@
             var count = parseInt(row[countCol], 10);
             if (!isFinite(rating) || isNaN(count)) continue;
             // only include high ratings
-            if (rating < 4.5) continue;
+            if (rating < 4.5 || count > 150) continue;
 
             var gem = false;
             if (gemCol !== -1) {
@@ -293,7 +293,7 @@
                 if (points[i].count > maxCount) maxCount = points[i].count;
             }
             var xMin = 0;
-            var xMax = makeNiceMax(maxCount);
+            var xMax = 150;
 
             p.push();
             // title
@@ -345,7 +345,7 @@
 
             // x ticks: choose a nice constant step based on the current maximum
             // label every 1000; compute how many ticks we need so no multiples are skipped
-            var step = 1000;
+            var step = 25;
             if (xMax < step) {
                 // if max is smaller than step, just draw one tick at the max
                 step = xMax;
