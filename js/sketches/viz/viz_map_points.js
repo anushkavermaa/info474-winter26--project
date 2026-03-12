@@ -155,7 +155,7 @@
         cuisineSelect.style.color = "#2d2015";
         cuisineSelect.addEventListener("change", function () {
           selectedCuisine = cuisineSelect.value || "ALL";
-          applyCuisineFilter();
+          applyFilters();
         });
         controlsContainer.appendChild(cuisineSelect);
 
