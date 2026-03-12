@@ -12,9 +12,11 @@
     var loading = false;
   
     // NEW: store markers so we can filter without re-fetching
-    var allMarkers = []; // { marker, cuisine }
+    var allMarkers = []; // { marker, cuisine, price }
     var cuisineSelect = null;
+    var priceSelect = null;
     var selectedCuisine = "ALL";
+    var selectedPrice = "ALL";
   
     function splitCsvLine(line) {
       var out = [];
@@ -74,6 +76,16 @@
     function getCuisineValue(row) {
       if (!row) return "Unknown";
       var keysToTry = ["Cuisine", "cuisine", "Category - Split 1", "Type", "Categories"];
+      for (var i = 0; i < keysToTry.length; i++) {
+        var k = keysToTry[i];
+        if (row[k] != null && String(row[k]).trim() !== "") return String(row[k]).trim();
+      }
+      return "Unknown";
+    }
+
+    function getPriceValue(row) {
+      if (!row) return "Unknown";
+      var keysToTry = ["Price", "price", "Price Range", "Cost"];
       for (var i = 0; i < keysToTry.length; i++) {
         var k = keysToTry[i];
         if (row[k] != null && String(row[k]).trim() !== "") return String(row[k]).trim();
@@ -146,9 +158,32 @@
           applyCuisineFilter();
         });
         controlsContainer.appendChild(cuisineSelect);
+
+        var priceLabel = document.createElement("label");
+        priceLabel.textContent = "Price range";
+        priceLabel.style.display = "block";
+        priceLabel.style.fontSize = "12px";
+        priceLabel.style.marginTop = "12px";
+        priceLabel.style.marginBottom = "6px";
+        priceLabel.style.color = "#2d2015";
+        controlsContainer.appendChild(priceLabel);
+
+        priceSelect = document.createElement("select");
+        priceSelect.id = "viz-map-points-price-select";
+        priceSelect.style.width = "100%";
+        priceSelect.style.padding = "8px";
+        priceSelect.style.borderRadius = "6px";
+        priceSelect.style.border = "1px solid #d8c8ad";
+        priceSelect.style.background = "#fffaf2";
+        priceSelect.style.color = "#2d2015";
+        priceSelect.addEventListener("change", function () {
+          selectedPrice = priceSelect.value || "ALL";
+          applyFilters();
+        });
+        controlsContainer.appendChild(priceSelect);
   
         var hint = document.createElement("div");
-        hint.textContent = "Choose a cuisine to show only matching restaurants.";
+        hint.textContent = "Choose a cuisine and/or price to show only matching restaurants.";
         hint.style.fontSize = "11px";
         hint.style.marginTop = "8px";
         hint.style.color = "#5a4537";
@@ -241,28 +276,68 @@
       cuisineSelect.value = canRestore ? prev : "ALL";
       selectedCuisine = cuisineSelect.value;
     }
+
+    function populatePriceDropdown(priceSet) {
+      if (!priceSelect) return;
+    
+      var prev = selectedPrice || "ALL";
+    
+      while (priceSelect.firstChild) priceSelect.removeChild(priceSelect.firstChild);
+    
+      var optAll = document.createElement("option");
+      optAll.value = "ALL";
+      optAll.textContent = "All prices";
+      priceSelect.appendChild(optAll);
+    
+      var prices = Array.from(priceSet || []);
+      prices.sort(function (a, b) {
+        return String(a).localeCompare(String(b));
+      });
+    
+      for (var i = 0; i < prices.length; i++) {
+        var p = prices[i];
+        var opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = p;
+        priceSelect.appendChild(opt);
+      }
+    
+      var canRestore = false;
+      for (var j = 0; j < priceSelect.options.length; j++) {
+        if (priceSelect.options[j].value === prev) {
+          canRestore = true;
+          break;
+        }
+      }
+    
+      priceSelect.value = canRestore ? prev : "ALL";
+      selectedPrice = priceSelect.value;
+    }
   
-    // NEW: apply filter by rebuilding the layer group
-    function applyCuisineFilter() {
+    function applyFilters() {
       if (!pointsLayer) return;
       pointsLayer.clearLayers();
-  
-      var sel = selectedCuisine || "ALL";
-      var selNorm = norm(sel);
-  
+    
+      var cuisineSel = selectedCuisine || "ALL";
+      var cuisineNorm = norm(cuisineSel);
+      var priceSel = selectedPrice || "ALL";
+      var priceNorm = norm(priceSel);
+    
       for (var i = 0; i < allMarkers.length; i++) {
         var entry = allMarkers[i];
         if (!entry || !entry.marker) continue;
-  
-        if (sel === "ALL") {
+    
+        var cuisineMatch =
+          cuisineSel === "ALL" ||
+          norm(entry.cuisine) === cuisineNorm ||
+          norm(entry.cuisine).indexOf(cuisineNorm) !== -1;
+    
+        var priceMatch =
+          priceSel === "ALL" ||
+          norm(entry.price) === priceNorm;
+    
+        if (cuisineMatch && priceMatch) {
           entry.marker.addTo(pointsLayer);
-        } else {
-          // Some rows might have multiple cuisines like "Thai, Dessert" or "Thai | Dessert"
-          // We'll do a contains-match to be forgiving.
-          var cNorm = norm(entry.cuisine);
-          if (cNorm === selNorm || cNorm.indexOf(selNorm) !== -1) {
-            entry.marker.addTo(pointsLayer);
-          }
         }
       }
     }
@@ -281,6 +356,7 @@
   
           allMarkers = [];
           var cuisineSet = new Set();
+          var priceSet = new Set();
   
           for (var i = 0; i < rows.length; i++) {
             var row = rows[i] || {};
@@ -293,7 +369,9 @@
             var area = String(row.Area || "Unknown Area");
             var stars = String(row.Star || "N/A");
             var cuisine = getCuisineValue(row);
+            var price = getPriceValue(row);
             cuisineSet.add(cuisine);
+            priceSet.add(price);
   
             var marker = L.circleMarker([lat, lon], {
               radius: 4,
@@ -309,6 +387,8 @@
                 "</strong><br/>" +
                 "Cuisine: " +
                 cuisine +
+                "Price: " +
+                price +
                 "<br/>" +
                 "Area: " +
                 area +
@@ -318,12 +398,13 @@
               { direction: "top", sticky: true, opacity: 0.95 }
             );
   
-            allMarkers.push({ marker: marker, cuisine: cuisine });
+            allMarkers.push({ marker: marker, cuisine: cuisine, price: price });
           }
   
           // Fill dropdown and show markers according to selection
           populateCuisineDropdown(cuisineSet);
-          applyCuisineFilter();
+          populatePriceDropdown(priceSet);
+          applyFilters();
   
           loaded = true;
           loading = false;
