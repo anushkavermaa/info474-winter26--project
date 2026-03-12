@@ -351,8 +351,6 @@
                     'Median: ' + hovered.median.toFixed(2),
                     'Q1: ' + hovered.q1.toFixed(2),
                     'Q3: ' + hovered.q3.toFixed(2),
-                    'Whisker Low: ' + hovered.whiskerLow.toFixed(2),
-                    'Whisker High: ' + hovered.whiskerHigh.toFixed(2),
                     'n: ' + hovered.count
                 ]);
             }
