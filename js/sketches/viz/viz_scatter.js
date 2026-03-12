@@ -71,6 +71,7 @@
         var rows = parsed.rows || [];
 
         // find the columns we'll need
+        var nameCol = findColIndex(headers, ['Name', 'Restaurant Name']);
         var ratingCol = findColIndex(headers, ['Star', 'Stars', 'Rating', 'Average Rating']);
         var countCol = findColIndex(headers, ['Stars count', 'Review Count', 'Number of Reviews']);
         var gemCol = findColIndex(headers, ['Hidden Gem', 'hidden gem']);
@@ -101,8 +102,9 @@
 
             var area = areaCol !== -1 ? String(row[areaCol] || '').trim() : '';
             var cuisine = cuisineCol !== -1 ? String(row[cuisineCol] || '').trim() : '';
+            var name = nameCol !== -1 ? String(row[nameCol] || '').trim() : '';
 
-            out.push({ rating: rating, count: count, gem: gem, area: area, cuisine: cuisine });
+            out.push({ name: name, rating: rating, count: count, gem: gem, area: area, cuisine: cuisine });
         }
         return { data: out, error: null };
     }
@@ -223,6 +225,7 @@
             return;
         }
         var lines = [
+            item.name,
             'Rating: ' + item.rating.toFixed(1),
             'Reviews: ' + item.count,
             'Area: ' + item.area,
