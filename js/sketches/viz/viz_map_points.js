@@ -387,6 +387,7 @@
                 "</strong><br/>" +
                 "Cuisine: " +
                 cuisine +
+                "<br/>" +
                 "Price: " +
                 price +
                 "<br/>" +
